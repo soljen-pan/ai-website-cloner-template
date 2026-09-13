@@ -152,7 +152,32 @@ Navigate to the target URL with browser MCP.
 - These are your master reference — builders will receive section-specific crops/screenshots later
 
 ### Global Extraction
-Extract these from the page before doing anything else:
+
+#### Design Tokens (Dembrandt-First Approach)
+
+**When Dembrandt MCP or CLI is available:**
+
+1. **Use Dembrandt to extract global design tokens:**
+   - Via MCP: Call `dembrandt.get_design_tokens` with the target URL
+   - Via CLI: Run `npx dembrandt <url>` if MCP unavailable
+   
+2. **Persist Dembrandt output:**
+   - Save JSON output to `docs/research/<site-key>/design-tokens.json`
+   - Generate human-readable summary to `docs/research/<site-key>/DESIGN.md`
+   - Include: colors (with oklch values), typography (families, sizes, weights, line-heights), spacing scale, border-radius values, shadows, breakpoints
+   
+3. **Use tokens as foundation:**
+   - Map Dembrandt-extracted colors to Tailwind/shadcn token names
+   - Configure fonts in `layout.tsx` using extracted families
+   - Set up spacing/sizing utilities based on extracted scale
+
+**Fallback (when Dembrandt unavailable):**
+- Use browser-based extraction with `getComputedStyle()` sampling
+- Document a wider range of elements to build a comprehensive token set
+
+#### Remaining Global Extraction
+
+Extract these from the page using browser MCP:
 
 **Fonts** — Inspect `<link>` tags for Google Fonts or self-hosted fonts. Check computed `font-family` on key elements (headings, body, code, labels). Document every family, weight, and style actually used. For a single-site app, configure shared fonts in `src/app/layout.tsx` using `next/font/google` or `next/font/local`. In an approved combined multi-site app, keep incompatible fonts/layout concerns route-scoped.
 
@@ -462,7 +487,37 @@ After all sections are built and merged, wire the page into the exact destinatio
 
 ## Phase 5: Visual QA Diff
 
-After assembly, do NOT declare the clone complete. Take side-by-side comparison screenshots:
+After assembly, do NOT declare the clone complete. Run scored pixel QA to validate accuracy:
+
+### Automated Pixel QA (Recommended)
+
+1. **Ensure dev server is running:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Run the pixel QA script:**
+   ```bash
+   ORIGINAL_URL=<target-url> npm run qa:pixel
+   ```
+
+3. **Review results:**
+   - Script tests at desktop (1440px), tablet (768px), mobile (390px)
+   - Compares original vs. local using pixelmatch
+   - Generates similarity scores per viewport
+   - **≥95% similarity required to pass**
+   - Saves visual diff artifacts to `docs/qa/pixel-diff/`
+
+4. **Fix discrepancies:**
+   - Review diff images (`*-diff.png`) — differences highlighted in red
+   - Check component spec files — was the value extracted correctly?
+   - If spec was wrong: re-extract from browser MCP, update spec, fix component
+   - If spec was right but builder got it wrong: fix component to match spec
+   - Re-run QA after fixes until all viewports pass
+
+### Manual Visual QA (If Automated QA Unavailable)
+
+Only use manual QA if the pixel QA script cannot run:
 
 1. Open the original site and the clone at its planned local route side-by-side (or take screenshots at the same viewport widths)
 2. Compare section by section, top to bottom, at desktop (1440px)
@@ -474,7 +529,16 @@ After assembly, do NOT declare the clone complete. Take side-by-side comparison 
 5. Test all interactive behaviors: scroll through the page, click every button/tab, hover over interactive elements
 6. Verify smooth scroll feels right, header transitions work, tab switching works, animations play
 
-Only after this visual QA pass is the clone complete.
+### QA Completion Criteria
+
+The clone is complete ONLY when:
+- [ ] Automated pixel QA passes with ≥95% similarity on all viewports (desktop/tablet/mobile)
+  - OR manual visual inspection confirms pixel-perfect match if automated QA unavailable
+- [ ] All interactive behaviors work correctly (scroll triggers, tabs, hovers, animations)
+- [ ] `npm run build` passes with no errors or warnings
+- [ ] All routes that existed before this run remain functional
+
+See `docs/PIXEL_QA.md` for full pixel QA documentation and troubleshooting.
 
 ## Pre-Dispatch Checklist
 
@@ -520,5 +584,6 @@ When done, report:
 - Total spec files written (should match components)
 - Total assets downloaded (images, videos, SVGs, fonts)
 - Build status (`npm run build` result)
-- Visual QA results (any remaining discrepancies)
-- Any known gaps or limitations
+- **Pixel QA results** (similarity scores per viewport, overall pass/fail)
+- Any remaining discrepancies or known gaps
+- Path to pixel QA artifacts (`docs/qa/pixel-diff/`) if automated QA was run

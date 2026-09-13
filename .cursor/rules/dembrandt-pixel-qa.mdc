@@ -1,0 +1,41 @@
+---
+description: Dembrandt-first design token extraction and scored pixel QA workflow
+alwaysApply: true
+---
+
+# Design Token Extraction & QA Workflow
+
+## Phase 1: Global Design Tokens (Foundation)
+When Dembrandt MCP or CLI is available:
+1. **MUST** use Dembrandt `get_design_tokens` (MCP) or `npx dembrandt` (CLI) to extract global design tokens from target site
+2. Persist Dembrandt output as JSON under `docs/research/<site-key>/design-tokens.json`
+3. Generate human-readable `docs/research/<site-key>/DESIGN.md` summary from the token data
+4. Use extracted tokens as foundation for Tailwind config and component styles
+
+If Dembrandt is unavailable, fall back to browser-based extraction (getComputedStyle sampling).
+
+## Phase 2: Browser Automation (Behavior & Components)
+Browser automation remains REQUIRED for:
+- Full-page screenshots (desktop/tablet/mobile)
+- Interaction sweeps (scroll/click/hover behaviors)
+- Per-component computed styles (element-specific CSS)
+- Asset discovery and download
+- Multi-state extraction (tabs, scroll triggers, hover states)
+
+## Phase 3: Build & Implementation
+Implement components using extracted tokens + behavior specs.
+
+## Phase 4: Scored Pixel QA (Quality Gate)
+After building:
+1. Run `npm run qa:pixel` to execute multi-viewport pixel-diff tests
+2. Tests compare original site screenshots vs local build at:
+   - Desktop: 1440px
+   - Tablet: 768px  
+   - Mobile: 390px
+3. Scoring is section/band-based using pixelmatch
+4. **95% similarity threshold** required to pass
+5. Visual diff artifacts saved to `docs/qa/pixel-diff/`
+6. Review and fix discrepancies before considering clone complete
+
+## Summary
+**Dembrandt first** for global tokens → **browser automation** for behavior/specs → **build** → **scored pixel QA gate**
