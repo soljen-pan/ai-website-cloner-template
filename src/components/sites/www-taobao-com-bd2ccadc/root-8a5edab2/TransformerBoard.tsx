@@ -28,7 +28,7 @@ export function TransformerBoard({ cards }: { cards: TaobaoTransformerCard[] }) 
   const [subsidy, jianghu, live, factory, cheap] = cards;
 
   return (
-    <div className="mt-3 grid h-[128px] grid-cols-5 gap-2">
+    <div className="mt-3 grid min-h-[128px] flex-1 grid-cols-5 gap-2">
       {subsidy ? (
         <section className="rounded-xl bg-[#f7f7f7] p-2">
           <CardHeader card={subsidy} />

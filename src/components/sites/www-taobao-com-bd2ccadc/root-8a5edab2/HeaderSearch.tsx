@@ -21,7 +21,7 @@ export function HeaderSearch() {
 
         <div className="min-w-0 flex-1 px-6">
           <form
-            className="relative flex h-10 items-center rounded-xl bg-[#f5f5f5] pl-2 pr-1"
+            className="relative flex h-10 items-center rounded-xl border-2 border-[#ff5000] bg-white pl-2 pr-1"
             action="https://s.taobao.com/search"
             method="get"
             onSubmit={(event) => {

@@ -36,9 +36,9 @@ export function TaobaoHome() {
       </div>
       <ChannelNav />
       <div className="tb-shell">
-        <div className="flex items-start">
+        <div className="flex items-stretch">
           <CategoryPanel />
-          <div className="mx-4 min-w-0 flex-1">
+          <div className="mx-4 flex min-w-0 flex-1 flex-col">
             <PromoBanner banners={taobaoHomeData.banners} />
             <TransformerBoard cards={taobaoHomeData.transformerCards} />
           </div>

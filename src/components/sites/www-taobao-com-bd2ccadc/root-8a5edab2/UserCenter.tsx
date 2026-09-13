@@ -19,7 +19,10 @@ export function UserCenter({
     >
       <div className="flex flex-1 flex-col items-center px-4 pt-7 text-center">
         <div className="mb-3 grid size-14 place-items-center rounded-full bg-white shadow-sm">
-          <span className="text-[28px] text-[#d6d6d6]">👤</span>
+          <svg viewBox="0 0 48 48" className="size-8 text-[#d6d6d6]" aria-hidden>
+            <circle cx="24" cy="18" r="7" fill="currentColor" />
+            <path d="M10 38c2.4-8 7.2-11 14-11s11.6 3 14 11" fill="currentColor" />
+          </svg>
         </div>
         <div className="text-[16px] leading-6 font-semibold text-[#1f1f1f]">{data.title}</div>
         <div className="mt-1 text-[12px] leading-5 text-[#7a7a7a]">{data.subtitle}</div>

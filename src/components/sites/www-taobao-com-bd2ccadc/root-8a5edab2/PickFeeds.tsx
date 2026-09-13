@@ -1,7 +1,7 @@
 import type { TaobaoFeedItem } from "@/types/taobao-home";
 
 export function PickFeeds({ items }: { items: TaobaoFeedItem[] }) {
-  const cards = items.filter((item) => item.image);
+  const cards = items.filter((item) => item.image && item.title && item.price);
 
   return (
     <section className="tb-shell mt-[18px] pb-10">
