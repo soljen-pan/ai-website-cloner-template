@@ -25,6 +25,8 @@ A reusable template for reverse-engineering any website into a clean, modern Nex
 - **UI:** shadcn/ui (Radix primitives, Tailwind CSS v4, `cn()` utility)
 - **Icons:** Lucide React (default — will be replaced/supplemented by extracted SVGs)
 - **Styling:** Tailwind CSS v4 with oklch design tokens
+- **Design Token Extraction:** Dembrandt (MCP/CLI — preferred for global tokens)
+- **Quality Assurance:** Playwright + pixelmatch (scored pixel-diff testing)
 - **Deployment:** Vercel
 
 ## Commands
@@ -33,6 +35,7 @@ A reusable template for reverse-engineering any website into a clean, modern Nex
 - `npm run lint` — ESLint check
 - `npm run typecheck` — TypeScript check
 - `npm run check` — Run lint + typecheck + build
+- `npm run qa:pixel` — Run scored pixel-diff QA (requires ORIGINAL_URL env var)
 
 ## Code Style
 - TypeScript strict mode, no `any`
@@ -46,6 +49,8 @@ A reusable template for reverse-engineering any website into a clean, modern Nex
 - **No personal aesthetic changes during emulation phase** — match 1:1 first, customize later
 - **Real content** — use actual text and assets from the target site, not placeholders
 - **Beauty-first** — every pixel matters
+- **Dembrandt-first extraction** — use Dembrandt MCP/CLI for global design tokens when available
+- **Scored quality gate** — pixel QA must achieve ≥95% similarity across all viewports
 
 ## Project Structure
 ```
@@ -72,6 +77,39 @@ scripts/            # Asset download scripts
 - When launching Claude Code agent teams, ALWAYS have each teammate work in their own worktree branch and merge everyone's work at the end, resolving any merge conflicts smartly since you are basically serving the orchestrator role and have full context to our goals, work given, work achieved, and desired outcomes.
 - After editing `AGENTS.md`, run `bash scripts/sync-agent-rules.sh` to regenerate platform-specific instruction files.
 - After editing `.claude/skills/clone-website/SKILL.md`, run `node scripts/sync-skills.mjs` to regenerate the skill for all platforms.
+
+## Workflow: Dembrandt → Browser → Build → QA
+
+### Phase 1: Foundation (Global Design Tokens)
+When Dembrandt MCP (via `.cursor/mcp.json`) or CLI (`npx dembrandt <url>`) is available:
+1. **MUST** use Dembrandt to extract global design tokens from the target site
+2. Persist output as JSON: `docs/research/<site-key>/design-tokens.json`
+3. Generate human-readable summary: `docs/research/<site-key>/DESIGN.md`
+4. Use extracted tokens as the foundation for Tailwind config and component styles
+
+If Dembrandt is unavailable, fall back to browser-based extraction (`getComputedStyle` sampling).
+
+### Phase 2: Browser Automation (Behavior & Components)
+Browser automation remains **REQUIRED** for:
+- Full-page screenshots (desktop/tablet/mobile)
+- Interaction sweeps (scroll/click/hover behaviors)
+- Per-component computed styles (element-specific CSS)
+- Asset discovery and download
+- Multi-state extraction (tabs, scroll triggers, hover states)
+
+### Phase 3: Build & Implementation
+Implement components using extracted tokens + behavior specs.
+
+### Phase 4: Scored Pixel QA (Quality Gate)
+After building, run pixel QA to validate accuracy:
+1. Start dev server: `npm run dev`
+2. Run QA: `ORIGINAL_URL=<target-url> npm run qa:pixel`
+3. Tests compare original vs. local at desktop (1440px), tablet (768px), mobile (390px)
+4. Scoring uses pixelmatch; **≥95% similarity required to pass**
+5. Visual diff artifacts saved to `docs/qa/pixel-diff/`
+6. Review and fix discrepancies before considering clone complete
+
+See `docs/PIXEL_QA.md` for full pixel QA documentation.
 
 # Website Inspection Guide
 

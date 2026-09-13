@@ -111,6 +111,8 @@ Give your AI coding agent a URL and watch it recreate the website as a clean Nex
 - **shadcn/ui** — Radix primitives + Tailwind CSS v4
 - **Tailwind CSS v4** — oklch design tokens
 - **Lucide React** — default icons (replaced by extracted SVGs during cloning)
+- **Dembrandt** — MCP/CLI for accurate global design token extraction
+- **Playwright + pixelmatch** — scored pixel-diff QA with 95% similarity gate
 
 ## How It Works
 
@@ -124,11 +126,11 @@ flowchart LR
     P4 --> P5["5. Assembly and QA"]
 ```
 
-1. **Reconnaissance** — screenshots, design token extraction, interaction sweep (scroll, click, hover, responsive)
+1. **Reconnaissance** — screenshots, **Dembrandt design token extraction** (when available), interaction sweep (scroll, click, hover, responsive)
 2. **Foundation** — updates fonts, colors, globals, downloads all assets
 3. **Component Specs** — writes detailed spec files (`docs/research/components/`) with exact computed CSS values, states, behaviors, and content
 4. **Parallel Build** — dispatches builder agents in git worktrees, one per section/component
-5. **Assembly & QA** — merges worktrees, wires up the page, runs visual diff against the original
+5. **Assembly & QA** — merges worktrees, wires up the page, runs **scored pixel-diff QA** (≥95% similarity gate) against the original
 
 Each builder agent receives the full component specification inline — exact `getComputedStyle()` values, interaction models, multi-state content, responsive breakpoints, and asset paths. No guessing.
 
@@ -177,12 +179,62 @@ GEMINI.md           # Gemini CLI config (imports AGENTS.md)
 ## Commands
 
 ```bash
-npm run dev    # Start dev server
-npm run build  # Production build
-npm run lint   # ESLint check
+npm run dev       # Start dev server
+npm run build     # Production build
+npm run lint      # ESLint check
 npm run typecheck # TypeScript check
-npm run check  # Run lint + typecheck + build
+npm run check     # Run lint + typecheck + build
+npm run qa:pixel  # Run scored pixel-diff QA (requires ORIGINAL_URL env var)
 ```
+
+**Pixel QA Example:**
+```bash
+npm run dev  # Start dev server in one terminal
+ORIGINAL_URL=https://example.com npm run qa:pixel  # Run QA in another terminal
+```
+
+See [`docs/PIXEL_QA.md`](docs/PIXEL_QA.md) for full pixel QA documentation.
+
+## Dembrandt Integration
+
+This template integrates [Dembrandt](https://github.com/dembrandt/dembrandt) for accurate global design token extraction. When available, the clone workflow automatically uses Dembrandt to extract colors, typography, spacing, and other design tokens from target sites.
+
+### Configuration
+
+The MCP configuration is pre-configured in `.cursor/mcp.json` and `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "dembrandt": {
+      "command": "npx",
+      "args": ["-y", "--package", "dembrandt", "dembrandt-mcp"]
+    }
+  }
+}
+```
+
+### Usage in Clone Workflow
+
+When running `/clone-website`, the agent will:
+
+1. **Prefer Dembrandt** for global design token extraction (when MCP is available)
+2. **Persist artifacts** to `docs/research/<site-key>/design-tokens.json` and `DESIGN.md`
+3. **Fall back** to browser-based extraction if Dembrandt is unavailable
+4. **Continue with browser automation** for behavior, interaction, and per-component styles
+
+### Manual Dembrandt Usage
+
+You can also run Dembrandt manually:
+
+```bash
+# Via npx (no installation needed)
+npx dembrandt https://example.com
+
+# Output will show extracted design tokens
+```
+
+The workflow preference is: **Dembrandt first** (global tokens) → **browser automation** (behavior/specs) → **build** → **scored pixel QA**.
 
 ### If using docker
 
