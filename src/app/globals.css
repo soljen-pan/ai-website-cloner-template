@@ -128,3 +128,112 @@
     @apply font-sans;
   }
 }
+
+@font-face {
+  font-family: iconfont;
+  src: url("/sites/www-taobao-com-bd2ccadc/shared/tb-iconfont.woff2") format("woff2");
+  font-display: swap;
+}
+
+.tb-ifont {
+  display: inline-block;
+  font-family: iconfont !important;
+  font-style: normal;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.tb-home {
+  --tbpc-primary-theme-color: #ff5000;
+  --tbpc-primary-theme-alpha-color: #ff500015;
+  --tbpc-price-color: #ff5000;
+  --tbpc-border-theme-color: #ffd5c2;
+  --tbpc-background-theme--color: #fff1eb;
+  --tbpc-gold-theme-color: #b88449;
+  --tbpc-primary-color: #1f1f1f;
+  --tbpc-secondary-color: #7a7a7a;
+  --tbpc-tertiary-color: #999;
+  --tbpc-disable-color: #ccc;
+  --tbpc-border-color: #d6d6d6;
+  --tbpc-divider-color: #ebebeb;
+  --tbpc-bg1-color: #f5f5f5;
+  --tbpc-bg2-color: #f7f7f7;
+  --tbpc-bg3-color: #fafafa;
+  --tbpc-white-color: #fff;
+  color: #1f1f1f;
+  background: #fff;
+  font:
+    12px/1.5 "Noto Sans SC",
+    "PingFang SC",
+    "Microsoft Yahei",
+    system-ui,
+    sans-serif;
+}
+
+.tb-home a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tb-home a:hover {
+  text-decoration: none;
+}
+
+.tb-shell {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 1200px;
+  max-width: 1760px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 48px;
+  padding-left: 48px;
+}
+
+.tb-feed-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tb-feed-card {
+  flex: 0 0 20%;
+  max-width: 20%;
+  box-sizing: border-box;
+}
+
+.tb-home .wrap-fixed {
+  padding-top: 99px;
+}
+
+.tb-home .wrap-fixed .top {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1001;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  background: #fff;
+}
+
+@media (min-width: 1415px) {
+  .tb-shell {
+    padding-right: 80px;
+    padding-left: 80px;
+  }
+}
+
+@media (min-width: 1343px) {
+  .tb-feed-card {
+    flex: 0 0 16.66%;
+    max-width: 16.66%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .tb-home {
+    overflow-x: auto;
+  }
+}
